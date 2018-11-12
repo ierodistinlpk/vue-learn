@@ -1,0 +1,26 @@
+<!-- -*- encoding:utf-8-*--->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="vue.js"></script>
+
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js"></script>
+<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.15.0/vuedraggable.min.js"></script>
+
+  <link rel="stylesheet" href="vuetest.css">
+</head>
+<body>
+
+  <div  id="app">
+    <grid id="grid" :data="data" :taskclick="taskclick" :editclick="editform" :upd="upd" :filterfield="filterfield"></grid> 
+    <mydetails v-if="current_task != null" :item="current_task" :editclick="editform"></mydetails>
+    <taskform v-if="form_task != null" :task="form_task" :fields="fields" :closeclick="closeform" :saveclick="saveform"></taskform>
+  </div>
+
+  <script src="vuetest.js"></script>
+
+</body>
+</html>
