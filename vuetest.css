@@ -1,34 +1,52 @@
 #grid{
-    position:absolute;
-    /*display:inline;*/
-    width:63%;
-    height:90%;
-    overflow-y:scroll;
-    overflow-x:hidden;
+    background:#f4f4f4;
+   /* position:absolute;*/
+   
 }
+.mydetails{
+    position:absolute;
+    display:inline-block;
+    padding:10px;
+    border: 1px solid green;
+    left:66%;
+    width:32%;
+    height:90%;
+    background:#fafada;
+    resize:horizontal;
+}
+
 .mytable{
+    position:absolute;
+    display:inline-block;
+    width:64%;
+    height:90%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    resize:horizontal;
 }
 .row{
     background:#fff;
-    padding: 2px;
     display:block;
     width:100%;
     overflow:hidden;
-    border-radius: 5px;
-    margin-top:5px;
+    margin-bottom:2px;
 }
 .collapsed{
     height:40px;
 }
 .cell{
-    background:#fafafa;
-    padding: 2px;
-    /*border: 1px solid;*/
-    bottom:0;
-    width:15%;
+    background:#f4f4f4;
+    width:16%;
     display:inline-block;
     vertical-align:top;
-    margin:2px
+    margin-right:0.5%;
+    /*fucking dirty hack*/
+    margin-bottom: -9000px;
+    padding-bottom: 9000px;
+}
+.dropacceptor{
+    background:#f0f0fa;
+    
 }
 .task{
     border: 1px solid;
@@ -43,39 +61,36 @@ img.icon {
 }
 .myfilter{
     display:inline;
+    color:#336699
 }
 .filterallowed{
-    background:yellow;
-/*    border:0px solid yellow;*/
-    border-radius: 5px;
-    margin:15px;
+    background:#336699;
+    color:#fafafa;
+    
 }
 .filterdisabled{
-    background:none;
-/*    border:none;*/
 }
 .filteritem{
     display:inline-block;
-    border-radius: 10px;
+    border-radius: 3px;
     padding-left:5px;
     padding-right:5px;
     margin:15px;
 }
 
-.mydetails{
-    position:absolute;
-    padding:10px;
-    border: 1px solid green;
-    left:66%;
-    width:33%;
-    height:90%;
-    background:#fafada;
+.priolow{
+    color:green;
+}
+.priomed{
+    color:orange;
+}
+.priohigh{
+    color:red;
 }
 div.taskform{
     background:#ddd;
     border: 1px solid red;
     position:absolute;
-    /*opacity:1;*/
     padding:5px;
     left:30%;
     top:10%;
@@ -90,4 +105,7 @@ div.modal{
 }
 select{
     font-family:Arial, FontAwesome;
+}
+p.subhead{
+    font-weight:bolder;
 }

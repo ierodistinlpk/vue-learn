@@ -6,7 +6,7 @@ var data=
 	{id:1,summary:'win',description:'defeat all',user:'boss',type:'task',priority:'med',version:'0.3',status:'open'},
 	{id:2,summary:'die',description:'lose all',user:'usr1',type:'task',priority:'high',version:'0.3',status:'open'},
 	{id:4,summary:'think',description:'thonk idea',user:'boss',type:'task',priority:'low',version:'0.3',status:'tested'},
-	{id:6,summary:'task6',description:'just test task',user:'usr2',type:'bug',priority:'low',version:'1',status:'tested'},
+	{id:6,summary:'task6',description:'just test task\nwith linebreak???',user:'usr2',type:'bug',priority:'low',version:'1',status:'tested'},
 	{id:7,summary:'win',description:'defeat boss',user:'superhero',type:'bug',priority:'high',version:'0.5',status:'in work'},
 	{id:11,summary:'task',description:'task',user:'boss',type:'task',priority:'low',version:'0.3',status:'open'},
 
@@ -26,18 +26,18 @@ var data=
     };
 
 Vue.component('grid', {
-    props:['data','taskclick','editclick','filterclick','upd','filterfield'],
+    props:['data','taskclick','editclick','filterclick','upd','filterfield','fields','statuses','users','current_task','editclick'],
     data:function(){
 	return {
-	    allowedversions:data.items.map(x=>x[this.filterfield]).filter((value, index, self)=>self.indexOf(value) === index),
+	    allowedversions:this.data.map(x=>x[this.filterfield]).filter((value, index, self)=>self.indexOf(value) === index),
 	}
     },
     computed:{
-	filterlist:function(){this.upd; //dirty hack to force recomputation =(
-			      return  data.items.map(x=>x[this.filterfield]).filter((value, index, self)=>self.indexOf(value) === index).sort()
+	filterlist:function(){//this.upd; //dirty hack to force recomputation =(
+			      return  this.data.map(x=>x[this.filterfield]).filter((value, index, self)=>self.indexOf(value) === index).sort()
 			     },
-	tabledata:function(){this.upd; return transform({items:filter(data.items,this.allowedversions),users:data.users,statuses:data.statuses})},
-	filterclass:function(){this.upd;
+	tabledata:function(){console.log(this.users);return transform({items:filter(this.data,this.allowedversions), users:this.users, statuses:this.statuses})},
+	filterclass:function(){//this.upd;
 			     let res={}
 			     for (let i=0;i<this.filterlist.length;i++){
 				 res[this.filterlist[i]]=(this.allowedversions.includes(this.filterlist[i]))?'filterallowed':'filterdisabled'
@@ -52,16 +52,23 @@ Vue.component('grid', {
 				      console.log(this.allowedversions);
 				     },
 	newtask:function(){
-	    nextid=Math.max(...data.items.map(e=>e.id))+1;
+	    nextid=Math.max(...this.data.map(e=>e.id))+1;
 	    this.editclick({id:nextid});
-	}
+	},
+	editform:function(){this.editclick(this.current_task);}
     },
-    template:"<div id='grid'><button @click=newtask>new task</button><myfilter :list=filterlist :listclasses=filterclass :field=filterfield :onclick=setallowedversion></myfilter><mytable :data=tabledata :taskclick=taskclick :editclick=editclick></mytable></div>"
+    template:"<div id='grid'><div><button @click=newtask>new task</button><myfilter :list=filterlist :listclasses=filterclass :field=filterfield :onclick=setallowedversion></myfilter></div><mytable :data=tabledata :taskclick=taskclick :editclick=editclick :cols=statuses></mytable><mydetails v-if=\"current_task != null\" :item=current_task :editclick=editform></mydetails></div>"
 });
 
 Vue.component('mytable', {
-    props:['data','taskclick','editclick'],
-    template:"<div class='mytablte'><row v-for=\"user in data.users\" :user=user :key=user.name :taskclick=taskclick :editclick=editclick></row></div>"
+    props:['data','taskclick','editclick','cols'],
+    template:"<div class='mytable'><theader :cols=cols></theader><row v-for=\"user in data.users\" :user=user :key=user.name :taskclick=taskclick :editclick=editclick></row></div>"
+});
+
+Vue.component('theader', {
+    props:['cols'],
+    data:function(){return{classes:['row']}},
+    template:"<div :class=classes ><div class='cell' v-for=\"status in cols\" >{{status}}</div></div>"
 });
 
 Vue.component('row', {
@@ -74,29 +81,26 @@ Vue.component('row', {
 	    this.expanded?this.pic='▼':this.pic='►'
 	},
     },
-    template:"<div :class=classes @click=collapse><p>{{pic}} {{ user.name }}</p><cell class='cell' v-for=\"status in Object.keys(user).filter((v)=>v!='name')\" :status=status :key=status :tasks=user[status] :taskheight=80 :taskclick=taskclick :editclick=editclick :user=user.name></cell></div>"
+    template:"<div :class=classes><p  @click=collapse>{{pic}} {{ user.name }}</p><cell class='cell' v-for=\"status in Object.keys(user).filter((v)=>v!='name')\" :status=status :key=status :tasks=user[status] :taskheight=40 :taskclick=taskclick :editclick=editclick :user=user.name></cell></div>"
 });
 
 Vue.component('cell', {
     props:['status','taskheight','tasks','taskclick','editclick','user'],
-    computed:{
-	divstyle:function(){return {'min-height':'100%'/*(Math.max(this.tasks.length,1)*this.taskheight)+"px"*/}}
-    },
-
     methods:{
-	dragenter:function(event){event.preventDefault(); this.$el.style.color="#ffdddd";},
-	dragleave:function(event){event.preventDefault(); this.$el.style.color=null;},
+	dragenter:function(event){event.preventDefault(); this.$el.classList.add("dropacceptor");},
+	dragleave:function(event){event.preventDefault(); this.$el.classList.remove("dropacceptor");},
 	dragover:function(event){event.preventDefault();},
 	drop:function(event){
 	    event.preventDefault();
 	    let task=document.getElementById(event.dataTransfer.getData("text")).__vue__;
-	    console.log(task.data);
+	   // console.log(task.data);
 	    task.data.status=this.status;
 	    task.data.user=this.user;
-	    this.$el.style.color=null;
+	    this.$el.classList.remove("dropacceptor");
 	},
     },
-    template:"<div :style=divstyle @dragleave.prevent=dragleave @dragenter.prevent=dragenter @dragover=dragover @drop=drop >{{status}} <task class='task'\
+    //{{status}}
+    template:"<div  @dragleave.prevent=dragleave @dragenter.prevent=dragenter @dragover=dragover @drop=drop > <task class='task'\
 		v-for=\"task in tasks\"\
 		:data=task\
 		:key=task.id\
@@ -110,7 +114,7 @@ Vue.component('task', {
     computed:{
 	typeimg:function(){return'img/'+this.data.type+'.png'},
 	imgcssclass:function(){return 'icon'},
-	priostyle:function(){let colors={low:'green',med:'orange',high:'red'}; return {color:colors[this.data.priority]}}
+	prioclass:function(){return 'prio'+this.data.priority}
     },
     methods:{
 	setDraggable:function(event){
@@ -119,7 +123,7 @@ Vue.component('task', {
 	show:function(){this.taskclick(this.data)},
 	edit:function(){this.editclick(this.data)}	
     },
-    template:"<div @dragstart=setDraggable  :draggable='true'  @click=show  :id=data.id><h3 ><img v-bind:src=typeimg v-bind:class=imgcssclass><span @click=edit># {{data.id}}</span></h3><p><span :style=priostyle>&#9670;</span> {{data.summary}}</p><p>version:{{ data.version }}</p></div>",
+    template:"<div @dragstart=setDraggable  :draggable='true'  @click=show  :id=data.id><h4><img v-bind:src=typeimg v-bind:class=imgcssclass># <a href='#' @click=edit>{{data.id}}</a></h4><p><span :class=prioclass>&#9670;</span> {{data.summary}}</p><p>version:{{ data.version }}</p></div>",
 });
 
 Vue.component('myfilter', {
@@ -158,11 +162,15 @@ Vue.component('mydetails', {
     methods:{
 	btnclick:function(){this.editclick(this.item)}
     },
-    template:"<div class='mydetails'><h3>#{{item.id}}: {{item.summary}} <input type='button' value='edit' @click=btnclick></h3>\
-<p><img v-bind:src=typeimg v-bind:class=imgcssclass> {{item.type}} {{item.status}}</p>\
-<p>owner: {{item.user}} </p>\
+    template:"<div class='mydetails'><p> <a href='item.id'> {{item.id}}</a>  <input type='button' value='edit' @click=btnclick> </p><p>{{item.summary}} </p>\
+<p class='subhead'>Подробности</p>\
+<p>Статус: {{item.status}}</p>\
 <p :style=priostyle>priority: {{item.priority}} </p>\
-<p style='white-space: pre;'><b>{{item.description}}</b> </p>\
+<p>Тип: <img v-bind:src=typeimg v-bind:class=imgcssclass> {{item.type}} </p>\
+<p class='subhead'>Люди</p>\
+<p>owner: {{item.user}} </p>\
+<p class='subhead'>Описание</p>\
+<p style='white-space: pre;'>{{item.description}}</p>\
 <p>version: {{item.version}}</p>\
 </div>"
 });
@@ -186,7 +194,7 @@ var app = new Vue({
 	    this.upd++
 	},
     },
-    data:{data:data.items,current_task:null,fields:data.fields, form_task:null,upd:0,filterfield:"version"}
+    data:{data:data.items, current_task:null, fields:data.fields, statuses:data.statuses, users:data.users, form_task:null,upd:0,filterfield:"version"}
 });
 
 

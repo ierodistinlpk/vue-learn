@@ -15,8 +15,13 @@
 <body>
 
   <div  id="app">
-    <grid id="grid" :data="data" :taskclick="taskclick" :editclick="editform" :upd="upd" :filterfield="filterfield"></grid> 
-    <mydetails v-if="current_task != null" :item="current_task" :editclick="editform"></mydetails>
+    <!--div id="header">
+      <button @click=newtask>new task</button>
+      <myfilter :list=filterlist :listclasses=filterclass :field=filterfield :onclick=setallowedversion></myfilter>
+    </div-->
+    <div>
+    <grid id="grid" :data="data" :taskclick="taskclick" :editclick="editform" :upd="upd" :filterfield="filterfield" :users="users" :statuses="statuses" :fields="fields" :current_task="current_task" :editclick="editclick"></grid> 
+    </div>
     <taskform v-if="form_task != null" :task="form_task" :fields="fields" :closeclick="closeform" :saveclick="saveform"></taskform>
   </div>
 
