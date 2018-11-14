@@ -37,10 +37,10 @@ Vue.component('grid', {
 			      return  data.items.map(x=>x[this.filterfield]).filter((value, index, self)=>self.indexOf(value) === index).sort()
 			     },
 	tabledata:function(){this.upd; return transform({items:filter(data.items,this.allowedversions),users:data.users,statuses:data.statuses})},
-	filterstyle:function(){this.upd;
+	filterclass:function(){this.upd;
 			     let res={}
 			     for (let i=0;i<this.filterlist.length;i++){
-				 res[this.filterlist[i]]=(this.allowedversions.includes(this.filterlist[i]))?{color:'green'}:{color:'gray'}
+				 res[this.filterlist[i]]=(this.allowedversions.includes(this.filterlist[i]))?'filterallowed':'filterdisabled'
 			     }
 			     return res;
 			    }
@@ -56,7 +56,7 @@ Vue.component('grid', {
 	    this.editclick({id:nextid});
 	}
     },
-    template:"<div id='grid'><button @click=newtask>new task</button><myfilter :list=filterlist :liststyles=filterstyle :field=filterfield :onclick=setallowedversion></myfilter><mytable :data=tabledata :taskclick=taskclick :editclick=editclick></mytable></div>"
+    template:"<div id='grid'><button @click=newtask>new task</button><myfilter :list=filterlist :listclasses=filterclass :field=filterfield :onclick=setallowedversion></myfilter><mytable :data=tabledata :taskclick=taskclick :editclick=editclick></mytable></div>"
 });
 
 Vue.component('mytable', {
@@ -66,13 +66,21 @@ Vue.component('mytable', {
 
 Vue.component('row', {
     props:['user','taskclick','editclick'],
-    template:"<div class='row'><p>{{ user.name }}</p><cell class='cell' v-for=\"status in Object.keys(user).filter((v)=>v!='name')\" :status=status :key=status :tasks=user[status] :taskheight=80 :taskclick=taskclick :editclick=editclick :user=user.name></cell></div>"
+    data:function(){return{expanded:true, classes:['row'],pic:'▼'}},
+    methods:{
+	collapse:function(){
+	    this.expanded=!this.expanded;
+	    this.expanded?this.classes.splice(-1,1):this.classes.push('collapsed');
+	    this.expanded?this.pic='▼':this.pic='►'
+	},
+    },
+    template:"<div :class=classes @click=collapse><p>{{pic}} {{ user.name }}</p><cell class='cell' v-for=\"status in Object.keys(user).filter((v)=>v!='name')\" :status=status :key=status :tasks=user[status] :taskheight=80 :taskclick=taskclick :editclick=editclick :user=user.name></cell></div>"
 });
 
 Vue.component('cell', {
     props:['status','taskheight','tasks','taskclick','editclick','user'],
     computed:{
-	divstyle:function(){return {'min-height':(Math.max(this.tasks.length,1)*this.taskheight)+"px"}}
+	divstyle:function(){return {'min-height':'100%'/*(Math.max(this.tasks.length,1)*this.taskheight)+"px"*/}}
     },
 
     methods:{
@@ -115,11 +123,11 @@ Vue.component('task', {
 });
 
 Vue.component('myfilter', {
-    props:['list','field','onclick','liststyles'],
+    props:['list','field','onclick','listclasses'],
     methods:{
 	setfilter:function(i){this.onclick(i)}
     },
-    template:"<div class='myfilter'>{{field}}: <div class='filteritem' :style=liststyles[item] @click='setfilter(item)' v-for=\"item in list\" :key='item'>{{item}}</div></div>"
+    template:"<div class='myfilter'><div class='filteritem'>{{field}}:</div><div class='filteritem' :class=listclasses[item] @click='setfilter(item)' v-for=\"item in list\" :key='item'>{{item}}</div></div>"
     
 });
 

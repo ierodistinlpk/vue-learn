@@ -9,20 +9,26 @@
 .mytable{
 }
 .row{
-    background:#fafafa;
+    background:#fff;
     padding: 2px;
     display:block;
     width:100%;
-    overflow:auto
+    overflow:hidden;
+    border-radius: 5px;
+    margin-top:5px;
 }
-
+.collapsed{
+    height:40px;
+}
 .cell{
     background:#fafafa;
     padding: 2px;
-    border: 1px solid;
+    /*border: 1px solid;*/
+    bottom:0;
     width:15%;
     display:inline-block;
     vertical-align:top;
+    margin:2px
 }
 .task{
     border: 1px solid;
@@ -38,6 +44,24 @@ img.icon {
 .myfilter{
     display:inline;
 }
+.filterallowed{
+    background:yellow;
+/*    border:0px solid yellow;*/
+    border-radius: 5px;
+    margin:15px;
+}
+.filterdisabled{
+    background:none;
+/*    border:none;*/
+}
+.filteritem{
+    display:inline-block;
+    border-radius: 10px;
+    padding-left:5px;
+    padding-right:5px;
+    margin:15px;
+}
+
 .mydetails{
     position:absolute;
     padding:10px;
@@ -55,10 +79,6 @@ div.taskform{
     padding:5px;
     left:30%;
     top:10%;
-}
-.filteritem{
-    display:inline-block;
-    padding:15px;
 }
 div.modal{
     z-index:99;
